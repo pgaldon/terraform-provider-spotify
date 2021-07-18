@@ -2,14 +2,27 @@ name: "Hello Actions"
 description: "Greet someone"
 
 inputs:
-  MY_NAME:
-    description: "Who to greet"
+  github_token:
+    description: 'Token for accessing the remote repo with authentication'
+    required: false
+
+  upstream_repository:
+    description: 'Upstream repository, e.g. => aormsby/Fork-Sync-With-Upstream-action'
     required: true
-    default: "World"
+
+  upstream_branch:
+    description: 'Branch to pull from, default = master'
+    required: true
+    default: 'master'
+
+  target_branch:
+    description: 'Branch to push to, default = master'
+    required: true
+    default: 'master'
 
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: "node12"
+  image: "main.js"
 
 branding:
   icon: "mic"
