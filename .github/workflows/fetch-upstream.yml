@@ -4,8 +4,8 @@ on:
   push:
     branches:
     - main
-  schedule:
-    - cron:  '* * * * 0'
+  #schedule:
+  #  - cron:  '* * * * 0'
     # scheduled at 07:12 every Monday and Thursday
   workflow_dispatch:
 
