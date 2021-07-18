@@ -26,7 +26,7 @@ jobs:
       id: sync
       uses: bdougie/Fork-Sync-With-Upstream-action@fork
       with:
-        upstream_repository: open-sauced/goals-template
+        upstream_repository: conradludgate/terraform-provider-spotify
         upstream_branch: main
         target_branch: main                       # optional
         github_token: ${{ secrets.GITHUB_TOKEN }}
