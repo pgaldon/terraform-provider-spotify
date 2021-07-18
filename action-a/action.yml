@@ -22,7 +22,7 @@ inputs:
 
 runs:
   using: "node12"
-  image: "action-a/main.js"
+  main: "action-a/main.js"
 
 branding:
   icon: "mic"
