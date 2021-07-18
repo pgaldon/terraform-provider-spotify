@@ -25,7 +25,7 @@ The following to your terraform configuration
 terraform {
   required_providers {
     spotify = {
-      version = "~> 0.1.4"
+      version = "~> 0.1.6"
       source  = "conradludgate/spotify"
     }
   }
@@ -35,7 +35,7 @@ terraform {
 ## How to use
 
 First, you need an instance of a spotify auth server running. This acts as a middleware between terraform and spotify to allow easy access to access tokens.
-See [spotify_auth_proxy](/spotify_auth_proxy) to get start.
+See [spotify_auth_proxy](/spotify_auth_proxy) to get started.
 
 Once you have the server running, make note of the API Key it gives you.
 
@@ -63,6 +63,7 @@ resource "spotify_playlist" "playlist" {
     data.spotify_track.overkill.id,
     data.spotify_track.blackwater.id,
     data.spotify_track.overkill.id,
+    data.spotify_search_track.search.tracks[0].id,
   ]
 }
 
@@ -71,5 +72,15 @@ data "spotify_track" "overkill" {
 }
 data "spotify_track" "blackwater" {
   spotify_id = "4lE6N1E0L8CssgKEUCgdbA"
+}
+
+data "spotify_search_track" "search" {
+  name    = "Somebody Told Me"
+  artists = ["The Killers"]
+  album   = "Hot Fuss"
+}
+
+output "test" {
+  value = data.spotify_search_track.search.tracks
 }
 ```
