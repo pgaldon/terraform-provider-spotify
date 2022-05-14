@@ -1,17 +1,19 @@
-package main
+package spotify
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/zmb3/spotify"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/zmb3/spotify/v2"
 )
 
 func dataSourceTrack() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceTrackRead,
+		ReadContext: dataSourceTrackRead,
 
 		Schema: map[string]*schema.Schema{
 			"spotify_id": {
@@ -46,36 +48,42 @@ func dataSourceTrack() *schema.Resource {
 	}
 }
 
-func dataSourceTrackRead(d *schema.ResourceData, m interface{}) error {
+func dataSourceTrackRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*spotify.Client)
 
 	var id spotify.ID
 	if u, ok := d.GetOk("url"); ok {
 		u, err := url.Parse(u.(string))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		if !strings.HasPrefix(u.Path, "/track/") {
-			return errors.New("URL did not point to a spotify track")
+			return diag.FromErr(errors.New("URL did not point to a spotify track"))
 		}
 		id = spotify.ID(strings.TrimPrefix(u.Path, "/track/"))
 	} else {
 		id = spotify.ID(d.Get("spotify_id").(string))
 	}
 
-	track, err := client.GetTrack(id)
+	track, err := client.GetTrack(ctx, id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	d.Set("name", track.Name)
-	d.Set("album", string(track.Album.ID))
+	if err := d.Set("name", track.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("album", string(track.Album.ID)); err != nil {
+		return diag.FromErr(err)
+	}
 
-	artists := make([]interface{}, len(track.Artists))
+	artists := make([]interface{}, 0, len(track.Artists))
 	for _, artist := range track.Artists {
 		artists = append(artists, string(artist.ID))
 	}
-	d.Set("artists", artists)
+	if err := d.Set("artists", artists); err != nil {
+		return diag.FromErr(err)
+	}
 	d.SetId(string(track.ID))
 
 	return nil
